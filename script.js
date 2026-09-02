@@ -205,20 +205,78 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ============================================
-     CONTACT FORM
+     CONTACT FORM – EmailJS
+     ============================================
+     FREE SETUP STEPS (do once):
+     1. Go to https://www.emailjs.com → Sign Up (free)
+     2. Dashboard → Email Services → Add Service → Gmail
+        → Connect velonzaoverseas@gmail.com → Copy SERVICE_ID
+     3. Dashboard → Email Templates → Create Template
+        Use these variables in the template:
+          {{from_name}}  {{phone}}  {{from_email}}
+          {{company}}    {{message}}
+        Set "To Email" = velonzaoverseas@gmail.com
+        → Copy TEMPLATE_ID
+     4. Dashboard → Account → Public Key → Copy PUBLIC_KEY
+     5. Paste all three below ↓
      ============================================ */
+  var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // ← paste here
+  var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // ← paste here
+  var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // ← paste here
+
   var contactForm = document.getElementById('contactForm');
   if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
       var btn = contactForm.querySelector('.btn-submit');
-      btn.textContent      = 'MESSAGE SENT ✓';
-      btn.style.background = '#4caf50';
-      setTimeout(function() {
-        btn.textContent      = 'SEND MESSAGE →';
-        btn.style.background = '';
-        contactForm.reset();
-      }, 3000);
+      var originalText = btn.textContent;
+
+      // Basic validation
+      var inputs = contactForm.querySelectorAll('input[required], textarea[required]');
+      var valid = true;
+      inputs.forEach(function(inp) {
+        if (!inp.value.trim()) { inp.style.borderColor = '#e74c3c'; valid = false; }
+        else { inp.style.borderColor = ''; }
+      });
+      if (!valid) return;
+
+      // Loading state
+      btn.textContent      = 'SENDING…';
+      btn.style.background = '#999';
+      btn.disabled         = true;
+
+      // Collect form data
+      var formData = {
+        from_name : contactForm.querySelector('input[placeholder="Name"]').value,
+        phone     : contactForm.querySelector('input[placeholder="Phone"]').value,
+        from_email: contactForm.querySelector('input[type="email"]').value,
+        company   : contactForm.querySelector('input[placeholder="Company"]').value,
+        message   : contactForm.querySelector('textarea').value
+      };
+
+      // Send via EmailJS
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formData)
+        .then(function() {
+          btn.textContent      = 'SENT ✓';
+          btn.style.background = '#4caf50';
+          contactForm.reset();
+          setTimeout(function() {
+            btn.textContent      = originalText;
+            btn.style.background = '';
+            btn.disabled         = false;
+          }, 4000);
+        })
+        .catch(function(err) {
+          console.error('EmailJS error:', err);
+          btn.textContent      = 'FAILED – TRY AGAIN';
+          btn.style.background = '#e74c3c';
+          btn.disabled         = false;
+          setTimeout(function() {
+            btn.textContent      = originalText;
+            btn.style.background = '';
+          }, 3000);
+        });
     });
   }
 
