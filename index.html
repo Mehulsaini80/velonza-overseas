@@ -11,8 +11,6 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
-  <!-- EmailJS SDK (free email service) -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 
 <body>
@@ -406,16 +404,19 @@
 
         <!-- Right: Form -->
         <form class="contact-form anim-right" id="contactForm">
+          <input type="hidden" name="access_key" id="web3formsAccessKey" value="YOUR_WEB3FORMS_ACCESS_KEY" />
+          <input type="hidden" name="subject" value="New Contact Inquiry - Velonza Overseas" />
+          <input type="hidden" name="from_name" value="Velonza Website Form" />
           <div class="form-row">
-            <input type="text" placeholder="Name" required />
-            <input type="tel" placeholder="Phone" />
+            <input type="text" name="name" placeholder="Name *" required />
+            <input type="tel" name="phone" placeholder="Phone" />
           </div>
           <div class="form-row">
-            <input type="email" placeholder="Email *" required />
-            <input type="text" placeholder="Company" />
+            <input type="email" name="email" placeholder="Email *" required />
+            <input type="text" name="company" placeholder="Company" />
           </div>
           <div class="form-row form-row-full">
-            <textarea placeholder="Message" rows="5" required></textarea>
+            <textarea name="message" placeholder="Message *" rows="5" required></textarea>
           </div>
           <button type="submit" class="btn-submit">SEND &rarr;</button>
         </form>

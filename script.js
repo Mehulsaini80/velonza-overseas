@@ -194,24 +194,15 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function() { projIndex = 0; updateProjSlider(); });
 
   /* ============================================
-     CONTACT FORM – EmailJS
+     CONTACT FORM – Web3Forms Integration
      ============================================
-     FREE SETUP STEPS (do once):
-     1. Go to https://www.emailjs.com → Sign Up (free)
-     2. Dashboard → Email Services → Add Service → Gmail
-        → Connect velonzaoverseas@gmail.com → Copy SERVICE_ID
-     3. Dashboard → Email Templates → Create Template
-        Use these variables in the template:
-          {{from_name}}  {{phone}}  {{from_email}}
-          {{company}}    {{message}}
-        Set "To Email" = velonzaoverseas@gmail.com
-        → Copy TEMPLATE_ID
-     4. Dashboard → Account → Public Key → Copy PUBLIC_KEY
-     5. Paste all three below ↓
+     FREE SETUP STEPS (Takes 10 seconds):
+     1. Go to https://web3forms.com
+     2. Enter your email: velonzaoverseas@gmail.com
+     3. Copy the Access Key sent to your email
+     4. Paste the Access Key below or in index.html (line 407)
      ============================================ */
-  var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // ← paste here
-  var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // ← paste here
-  var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // ← paste here
+  var WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY'; // ← Paste Access Key here
 
   var contactForm = document.getElementById('contactForm');
   if (contactForm) {
@@ -229,43 +220,50 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       if (!valid) return;
 
+      var hiddenKeyInput = document.getElementById('web3formsAccessKey');
+      if (hiddenKeyInput && WEB3FORMS_ACCESS_KEY !== 'YOUR_WEB3FORMS_ACCESS_KEY') {
+        hiddenKeyInput.value = WEB3FORMS_ACCESS_KEY;
+      }
+
+      var currentKey = hiddenKeyInput ? hiddenKeyInput.value : WEB3FORMS_ACCESS_KEY;
+      if (!currentKey || currentKey === 'YOUR_WEB3FORMS_ACCESS_KEY') {
+        alert('Please set your Web3Forms Access Key in script.js or index.html to start receiving emails at velonzaoverseas@gmail.com!');
+        return;
+      }
+
       // Loading state
       btn.textContent      = 'SENDING…';
       btn.style.background = '#999';
       btn.disabled         = true;
 
-      // Collect form data
-      var formData = {
-        from_name : contactForm.querySelector('input[placeholder="Name"]').value,
-        phone     : contactForm.querySelector('input[placeholder="Phone"]').value,
-        from_email: contactForm.querySelector('input[type="email"]').value,
-        company   : contactForm.querySelector('input[placeholder="Company"]').value,
-        message   : contactForm.querySelector('textarea').value
-      };
+      var formData = new FormData(contactForm);
 
-      // Send via EmailJS
-      emailjs.init(EMAILJS_PUBLIC_KEY);
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, formData)
-        .then(function() {
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.success) {
           btn.textContent      = 'SENT ✓';
           btn.style.background = '#4caf50';
           contactForm.reset();
-          setTimeout(function() {
-            btn.textContent      = originalText;
-            btn.style.background = '';
-            btn.disabled         = false;
-          }, 4000);
-        })
-        .catch(function(err) {
-          console.error('EmailJS error:', err);
-          btn.textContent      = 'FAILED – TRY AGAIN';
-          btn.style.background = '#e74c3c';
+        } else {
+          throw new Error(data.message || 'Form submission failed');
+        }
+      })
+      .catch(function(err) {
+        console.error('Web3Forms submit error:', err);
+        btn.textContent      = 'FAILED – TRY AGAIN';
+        btn.style.background = '#e74c3c';
+      })
+      .finally(function() {
+        setTimeout(function() {
+          btn.textContent      = originalText;
+          btn.style.background = '';
           btn.disabled         = false;
-          setTimeout(function() {
-            btn.textContent      = originalText;
-            btn.style.background = '';
-          }, 3000);
-        });
+        }, 4000);
+      });
     });
   }
 
