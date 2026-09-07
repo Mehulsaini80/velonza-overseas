@@ -194,17 +194,6 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function() { projIndex = 0; updateProjSlider(); });
 
   /* ============================================
-     SERVICE CARD – CLICK ACTIVE
-     ============================================ */
-  var serviceCards = document.querySelectorAll('.service-card');
-  serviceCards.forEach(function(card) {
-    card.addEventListener('click', function() {
-      serviceCards.forEach(function(c) { c.classList.remove('active-card'); });
-      card.classList.add('active-card');
-    });
-  });
-
-  /* ============================================
      CONTACT FORM – EmailJS
      ============================================
      FREE SETUP STEPS (do once):
