@@ -194,19 +194,15 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function() { projIndex = 0; updateProjSlider(); });
 
   /* ============================================
-     CONTACT FORM – SMTPJS / Mail Integration
+     CONTACT FORM – Standard Free Native Submission
      ============================================
-     Uses SMTPJS for direct email sending, with automatic
-     pre-filled Mail App redirect fallback for 100% success rate!
+     Submits directly to FormSubmit.co without API keys or JS fetch.
+     Target Email: velonzaoverseas@gmail.com
      ============================================ */
-  var SMTPJS_SECURE_TOKEN = ''; // ← (Optional) Enter SMTPJS Token here if using ElasticEmail / SMTPJS
-
   var contactForm = document.getElementById('contactForm');   
   if (contactForm) { 
     contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
       var btn = contactForm.querySelector('.btn-submit');
-      var originalText = btn.textContent;
 
       // Basic validation
       var inputs = contactForm.querySelectorAll('input[required], textarea[required]');
@@ -215,78 +211,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!inp.value.trim()) { inp.style.borderColor = '#e74c3c'; valid = false; }
         else { inp.style.borderColor = ''; }
       });
-      if (!valid) return;
 
-      var name    = contactForm.querySelector('input[name="name"]') ? contactForm.querySelector('input[name="name"]').value.trim() : '';
-      var phone   = contactForm.querySelector('input[name="phone"]') ? contactForm.querySelector('input[name="phone"]').value.trim() : '';
-      var email   = contactForm.querySelector('input[name="email"]') ? contactForm.querySelector('input[name="email"]').value.trim() : '';
-      var company = contactForm.querySelector('input[name="company"]') ? contactForm.querySelector('input[name="company"]').value.trim() : '';
-      var message = contactForm.querySelector('textarea[name="message"]') ? contactForm.querySelector('textarea[name="message"]').value.trim() : '';
+      if (!valid) {
+        e.preventDefault();
+        return;
+      }
 
-      // Loading state
+      // Visual feedback before browser submits
       btn.textContent      = 'SENDING…';
       btn.style.background = '#999';
-      btn.disabled         = true;
-
-      if (typeof Email !== 'undefined' && SMTPJS_SECURE_TOKEN !== '') {
-        var bodyHtml = "<strong>New Inquiry - Velonza Overseas</strong><br><br>"
-          + "<strong>Name:</strong> " + name + "<br>"
-          + "<strong>Phone:</strong> " + (phone || 'N/A') + "<br>"
-          + "<strong>Email:</strong> " + email + "<br>"
-          + "<strong>Company:</strong> " + (company || 'N/A') + "<br>"
-          + "<strong>Message:</strong> " + message;
-
-        Email.send({
-          SecureToken: SMTPJS_SECURE_TOKEN,
-          To: 'velonzaoverseas@gmail.com',
-          From: 'velonzaoverseas@gmail.com',
-          Subject: "New Contact Inquiry from " + name,
-          Body: bodyHtml
-        }).then(function(response) {
-          if (response === 'OK') {
-            btn.textContent      = 'SENT ✓';
-            btn.style.background = '#4caf50';
-            contactForm.reset();
-          } else {
-            console.warn('SMTPJS response not OK:', response);
-            triggerMailtoFallback(name, phone, email, company, message, btn);
-          }
-        }).catch(function(err) {
-          console.error('SMTPJS Exception:', err);
-          triggerMailtoFallback(name, phone, email, company, message, btn);
-        }).finally(function() {
-          resetSubmitBtn(btn, originalText);
-        });
-      } else {
-        // Direct pre-filled Mail App redirect (100% reliable)
-        triggerMailtoFallback(name, phone, email, company, message, btn);
-        resetSubmitBtn(btn, originalText);
-      }
     });
-  }
-
-  function triggerMailtoFallback(name, phone, email, company, message, btn) {
-    var mailSubject = encodeURIComponent("Inquiry from " + name + " - Velonza Overseas");
-    var mailBody    = encodeURIComponent(
-        "New Website Contact Inquiry:\n\n"
-      + "Name: " + name + "\n"
-      + "Phone: " + (phone || "N/A") + "\n"
-      + "Email: " + email + "\n"
-      + "Company: " + (company || "N/A") + "\n\n"
-      + "Message:\n" + message
-    );
-    window.location.href = "mailto:velonzaoverseas@gmail.com?subject=" + mailSubject + "&body=" + mailBody;
-    btn.textContent      = 'SENT ✓';
-    btn.style.background = '#4caf50';
-    if (contactForm) contactForm.reset();
-  }
-
-  function resetSubmitBtn(btn, originalText) {
-    setTimeout(function() {
-      btn.textContent      = originalText;
-      btn.style.background = '';
-      btn.disabled         = false;
-    }, 4000);
   }
 
   /* ============================================
