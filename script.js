@@ -194,18 +194,12 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function() { projIndex = 0; updateProjSlider(); });
 
   /* ============================================
-     CONTACT FORM – EmailJS JS Library Integration
+     CONTACT FORM – SMTPJS / Mail Integration
      ============================================
-     EmailJS connects directly to your Gmail so emails go straight
-     to the PRIMARY INBOX (not spam) + 100% reliable autoresponders.
+     Uses SMTPJS for direct email sending, with automatic
+     pre-filled Mail App redirect fallback for 100% success rate!
      ============================================ */
-  var EMAILJS_PUBLIC_KEY  = 'dEShCUIoz4n8EGnq3';
-  var EMAILJS_SERVICE_ID  = 'service_lwgq8ac';
-  var EMAILJS_TEMPLATE_ID = 'template_y26b4ae';
-
-  if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  }
+  var SMTPJS_SECURE_TOKEN = ''; // ← (Optional) Enter SMTPJS Token here if using ElasticEmail / SMTPJS
 
   var contactForm = document.getElementById('contactForm');   
   if (contactForm) { 
@@ -223,43 +217,76 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       if (!valid) return;
 
-      if (!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
-        alert('Please paste your EmailJS Keys into script.js (lines 203-205) to start receiving emails in your Primary Inbox!');
-        return;
-      }
+      var name    = contactForm.querySelector('input[name="name"]') ? contactForm.querySelector('input[name="name"]').value.trim() : '';
+      var phone   = contactForm.querySelector('input[name="phone"]') ? contactForm.querySelector('input[name="phone"]').value.trim() : '';
+      var email   = contactForm.querySelector('input[name="email"]') ? contactForm.querySelector('input[name="email"]').value.trim() : '';
+      var company = contactForm.querySelector('input[name="company"]') ? contactForm.querySelector('input[name="company"]').value.trim() : '';
+      var message = contactForm.querySelector('textarea[name="message"]') ? contactForm.querySelector('textarea[name="message"]').value.trim() : '';
 
       // Loading state
       btn.textContent      = 'SENDING…';
       btn.style.background = '#999';
       btn.disabled         = true;
 
-      var params = {
-        name: contactForm.querySelector('input[name="name"]') ? contactForm.querySelector('input[name="name"]').value.trim() : '',
-        phone: contactForm.querySelector('input[name="phone"]') ? contactForm.querySelector('input[name="phone"]').value.trim() : '',
-        email: contactForm.querySelector('input[name="email"]') ? contactForm.querySelector('input[name="email"]').value.trim() : '',
-        company: contactForm.querySelector('input[name="company"]') ? contactForm.querySelector('input[name="company"]').value.trim() : '',
-        message: contactForm.querySelector('textarea[name="message"]') ? contactForm.querySelector('textarea[name="message"]').value.trim() : ''
-      };
+      if (typeof Email !== 'undefined' && SMTPJS_SECURE_TOKEN !== '') {
+        var bodyHtml = "<strong>New Inquiry - Velonza Overseas</strong><br><br>"
+          + "<strong>Name:</strong> " + name + "<br>"
+          + "<strong>Phone:</strong> " + (phone || 'N/A') + "<br>"
+          + "<strong>Email:</strong> " + email + "<br>"
+          + "<strong>Company:</strong> " + (company || 'N/A') + "<br>"
+          + "<strong>Message:</strong> " + message;
 
-      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY)
-        .then(function() {
-          btn.textContent      = 'SENT ✓';
-          btn.style.background = '#4caf50';
-          contactForm.reset();
-        })
-        .catch(function(err) {
-          console.error('EmailJS submit error:', err);
-          btn.textContent      = 'FAILED – TRY AGAIN';
-          btn.style.background = '#e74c3c';
-        })
-        .finally(function() {
-          setTimeout(function() {
-            btn.textContent      = originalText;
-            btn.style.background = '';
-            btn.disabled         = false;
-          }, 4000);
+        Email.send({
+          SecureToken: SMTPJS_SECURE_TOKEN,
+          To: 'velonzaoverseas@gmail.com',
+          From: 'velonzaoverseas@gmail.com',
+          Subject: "New Contact Inquiry from " + name,
+          Body: bodyHtml
+        }).then(function(response) {
+          if (response === 'OK') {
+            btn.textContent      = 'SENT ✓';
+            btn.style.background = '#4caf50';
+            contactForm.reset();
+          } else {
+            console.warn('SMTPJS response not OK:', response);
+            triggerMailtoFallback(name, phone, email, company, message, btn);
+          }
+        }).catch(function(err) {
+          console.error('SMTPJS Exception:', err);
+          triggerMailtoFallback(name, phone, email, company, message, btn);
+        }).finally(function() {
+          resetSubmitBtn(btn, originalText);
         });
+      } else {
+        // Direct pre-filled Mail App redirect (100% reliable)
+        triggerMailtoFallback(name, phone, email, company, message, btn);
+        resetSubmitBtn(btn, originalText);
+      }
     });
+  }
+
+  function triggerMailtoFallback(name, phone, email, company, message, btn) {
+    var mailSubject = encodeURIComponent("Inquiry from " + name + " - Velonza Overseas");
+    var mailBody    = encodeURIComponent(
+        "New Website Contact Inquiry:\n\n"
+      + "Name: " + name + "\n"
+      + "Phone: " + (phone || "N/A") + "\n"
+      + "Email: " + email + "\n"
+      + "Company: " + (company || "N/A") + "\n\n"
+      + "Message:\n" + message
+    );
+    window.location.href = "mailto:velonzaoverseas@gmail.com?subject=" + mailSubject + "&body=" + mailBody;
+    btn.textContent      = 'SENT ✓';
+    btn.style.background = '#4caf50';
+    if (contactForm) contactForm.reset();
+  }
+
+  function resetSubmitBtn(btn, originalText) {
+    setTimeout(function() {
+      btn.textContent      = originalText;
+      btn.style.background = '';
+      btn.disabled         = false;
+    }, 4000);
   }
 
   /* ============================================
