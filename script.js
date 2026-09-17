@@ -199,9 +199,9 @@ document.addEventListener('DOMContentLoaded', function () {
      EmailJS connects directly to your Gmail so emails go straight
      to the PRIMARY INBOX (not spam) + 100% reliable autoresponders.
      ============================================ */
-  var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';  // ← Paste EmailJS Public Key here
-  var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';  // ← Paste Service ID here (e.g. service_gmail)
-  var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // ← Paste Template ID here
+  var EMAILJS_PUBLIC_KEY  = 'dEShCUIoz4n8EGnq3';
+  var EMAILJS_SERVICE_ID  = 'service_lwgq8ac';
+  var EMAILJS_TEMPLATE_ID = 'template_y26b4ae';
 
   if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
     emailjs.init(EMAILJS_PUBLIC_KEY);
