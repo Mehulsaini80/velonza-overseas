@@ -194,11 +194,19 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function() { projIndex = 0; updateProjSlider(); });
 
   /* ============================================
-     CONTACT FORM – FormSubmit.co Integration (100% FREE)
+     CONTACT FORM – EmailJS JS Library Integration
      ============================================
-     100% FREE, Unlimited Submissions, Auto-Responder included!
-     Target Email: velonzaoverseas@gmail.com
+     EmailJS connects directly to your Gmail so emails go straight
+     to the PRIMARY INBOX (not spam) + 100% reliable autoresponders.
      ============================================ */
+  var EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';  // ← Paste EmailJS Public Key here
+  var EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';  // ← Paste Service ID here (e.g. service_gmail)
+  var EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // ← Paste Template ID here
+
+  if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY') {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+  }
+
   var contactForm = document.getElementById('contactForm');   
   if (contactForm) { 
     contactForm.addEventListener('submit', function(e) {
@@ -215,39 +223,34 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       if (!valid) return;
 
+      if (!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+        alert('Please paste your EmailJS Keys into script.js (lines 203-205) to start receiving emails in your Primary Inbox!');
+        return;
+      }
+
       // Loading state
       btn.textContent      = 'SENDING…';
       btn.style.background = '#999';
       btn.disabled         = true;
 
-      var formData = new FormData(contactForm);
-
-      fetch('https://formsubmit.co/ajax/velonzaoverseas@gmail.com', {
-        method: 'POST',
-        body: formData
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if (data.success === 'true' || data.success === true) {
+      emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, contactForm)
+        .then(function() {
           btn.textContent      = 'SENT ✓';
           btn.style.background = '#4caf50';
           contactForm.reset();
-        } else {
-          throw new Error(data.message || 'Form submission failed');
-        }
-      })
-      .catch(function(err) {
-        console.error('FormSubmit error:', err);
-        // If AJAX is blocked or initial activation needed, fallback to standard form submit
-        contactForm.submit();
-      })
-      .finally(function() {
-        setTimeout(function() {
-          btn.textContent      = originalText;
-          btn.style.background = '';
-          btn.disabled         = false;
-        }, 4000);
-      });
+        })
+        .catch(function(err) {
+          console.error('EmailJS submit error:', err);
+          btn.textContent      = 'FAILED – TRY AGAIN';
+          btn.style.background = '#e74c3c';
+        })
+        .finally(function() {
+          setTimeout(function() {
+            btn.textContent      = originalText;
+            btn.style.background = '';
+            btn.disabled         = false;
+          }, 4000);
+        });
     });
   }
 
