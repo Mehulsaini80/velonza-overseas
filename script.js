@@ -218,6 +218,10 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.disabled         = true;
 
       var formData = new FormData(contactForm);
+      var userEmail = contactForm.querySelector('input[name="email"]') ? contactForm.querySelector('input[name="email"]').value.trim() : '';
+      if (userEmail) {
+        formData.append('_replyto', userEmail);
+      }
 
       fetch('https://formspree.io/f/xppwzkeg', {
         method: 'POST',
