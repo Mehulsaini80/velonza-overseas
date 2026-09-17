@@ -194,15 +194,14 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function() { projIndex = 0; updateProjSlider(); });
 
   /* ============================================
-     CONTACT FORM – Standard Free Native Submission
-     ============================================
-     Submits directly to FormSubmit.co without API keys or JS fetch.
-     Target Email: velonzaoverseas@gmail.com
+     CONTACT FORM – Formspree Integration (formspree.io/f/xppwzkeg)
      ============================================ */
   var contactForm = document.getElementById('contactForm');   
   if (contactForm) { 
     contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
       var btn = contactForm.querySelector('.btn-submit');
+      var originalText = btn.textContent;
 
       // Basic validation
       var inputs = contactForm.querySelectorAll('input[required], textarea[required]');
@@ -211,15 +210,45 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!inp.value.trim()) { inp.style.borderColor = '#e74c3c'; valid = false; }
         else { inp.style.borderColor = ''; }
       });
+      if (!valid) return;
 
-      if (!valid) {
-        e.preventDefault();
-        return;
-      }
-
-      // Visual feedback before browser submits
+      // Loading state
       btn.textContent      = 'SENDING…';
       btn.style.background = '#999';
+      btn.disabled         = true;
+
+      var formData = new FormData(contactForm);
+
+      fetch('https://formspree.io/f/xppwzkeg', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      .then(function(response) {
+        if (response.ok) {
+          btn.textContent      = 'SENT ✓';
+          btn.style.background = '#4caf50';
+          contactForm.reset();
+        } else {
+          return response.json().then(function(data) {
+            throw new Error(data.error || 'Form submission failed');
+          });
+        }
+      })
+      .catch(function(err) {
+        console.error('Formspree submit error:', err);
+        btn.textContent      = 'FAILED – TRY AGAIN';
+        btn.style.background = '#e74c3c';
+      })
+      .finally(function() {
+        setTimeout(function() {
+          btn.textContent      = originalText;
+          btn.style.background = '';
+          btn.disabled         = false;
+        }, 4000);
+      });
     });
   }
 
