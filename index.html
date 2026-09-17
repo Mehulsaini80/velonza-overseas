@@ -384,29 +384,30 @@
 
         <!-- Left: Contact Info -->
         <div class="contact-info anim-left">
-          <div class="contact-item">
+          <a href="tel:+917850939946" class="contact-item contact-link">
             <span class="contact-icon phone-icon">📞</span>
             <span>+91 78509 39946</span>
-          </div>
-          <div class="contact-item">
+          </a>
+          <a href="tel:+919057573948" class="contact-item contact-link">
             <span class="contact-icon phone-icon">📞</span>
             <span>+91 90575 73948</span>
-          </div>
-          <div class="contact-item">
+          </a>
+          <a href="tel:+8613066460442" class="contact-item contact-link">
             <span class="contact-icon phone-icon">📞</span>
             <span>+86 130 6646 0442</span>
-          </div>
-          <div class="contact-item">
+          </a>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=velonzaoverseas@gmail.com&su=Inquiry%20-%20Velonza%20Overseas" target="_blank" rel="noopener noreferrer" class="contact-item contact-link" title="Open Gmail Compose">
             <span class="contact-icon">✉️</span>
             <span>velonzaoverseas@gmail.com</span>
-          </div>
+          </a>
         </div>
 
         <!-- Right: Form -->
-        <form class="contact-form anim-right" id="contactForm">
-          <input type="hidden" name="access_key" id="web3formsAccessKey" value="YOUR_WEB3FORMS_ACCESS_KEY" />
-          <input type="hidden" name="subject" value="New Contact Inquiry - Velonza Overseas" />
-          <input type="hidden" name="from_name" value="Velonza Website Form" />
+        <form class="contact-form anim-right" id="contactForm" action="https://formsubmit.co/ajax/velonzaoverseas@gmail.com" method="POST">
+          <input type="hidden" name="_subject" value="New Contact Inquiry - Velonza Overseas" />
+          <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_autorespond" value="Thank you for reaching out to Velonza Overseas! We have received your inquiry and our team will get back to you shortly." />
           <div class="form-row">
             <input type="text" name="name" placeholder="Name *" required />
             <input type="tel" name="phone" placeholder="Phone" />

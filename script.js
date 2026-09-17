@@ -194,18 +194,13 @@ document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('resize', function() { projIndex = 0; updateProjSlider(); });
 
   /* ============================================
-     CONTACT FORM – Web3Forms Integration
+     CONTACT FORM – FormSubmit.co Integration (100% FREE)
      ============================================
-     FREE SETUP STEPS (Takes 10 seconds):
-     1. Go to https://web3forms.com
-     2. Enter your email: velonzaoverseas@gmail.com
-     3. Copy the Access Key sent to your email
-     4. Paste the Access Key below or in index.html (line 407)
+     100% FREE, Unlimited Submissions, Auto-Responder included!
+     Target Email: velonzaoverseas@gmail.com
      ============================================ */
-  var WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY'; // ← Paste Access Key here
-
-  var contactForm = document.getElementById('contactForm');
-  if (contactForm) {
+  var contactForm = document.getElementById('contactForm');   
+  if (contactForm) { 
     contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
       var btn = contactForm.querySelector('.btn-submit');
@@ -220,17 +215,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       if (!valid) return;
 
-      var hiddenKeyInput = document.getElementById('web3formsAccessKey');
-      if (hiddenKeyInput && WEB3FORMS_ACCESS_KEY !== 'YOUR_WEB3FORMS_ACCESS_KEY') {
-        hiddenKeyInput.value = WEB3FORMS_ACCESS_KEY;
-      }
-
-      var currentKey = hiddenKeyInput ? hiddenKeyInput.value : WEB3FORMS_ACCESS_KEY;
-      if (!currentKey || currentKey === 'YOUR_WEB3FORMS_ACCESS_KEY') {
-        alert('Please set your Web3Forms Access Key in script.js or index.html to start receiving emails at velonzaoverseas@gmail.com!');
-        return;
-      }
-
       // Loading state
       btn.textContent      = 'SENDING…';
       btn.style.background = '#999';
@@ -238,13 +222,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
       var formData = new FormData(contactForm);
 
-      fetch('https://api.web3forms.com/submit', {
+      fetch('https://formsubmit.co/ajax/velonzaoverseas@gmail.com', {
         method: 'POST',
         body: formData
       })
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        if (data.success) {
+        if (data.success === 'true' || data.success === true) {
           btn.textContent      = 'SENT ✓';
           btn.style.background = '#4caf50';
           contactForm.reset();
@@ -253,9 +237,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       })
       .catch(function(err) {
-        console.error('Web3Forms submit error:', err);
-        btn.textContent      = 'FAILED – TRY AGAIN';
-        btn.style.background = '#e74c3c';
+        console.error('FormSubmit error:', err);
+        // If AJAX is blocked or initial activation needed, fallback to standard form submit
+        contactForm.submit();
       })
       .finally(function() {
         setTimeout(function() {
