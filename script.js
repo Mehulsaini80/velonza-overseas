@@ -233,7 +233,15 @@ document.addEventListener('DOMContentLoaded', function () {
       btn.style.background = '#999';
       btn.disabled         = true;
 
-      emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, contactForm)
+      var params = {
+        name: contactForm.querySelector('input[name="name"]') ? contactForm.querySelector('input[name="name"]').value.trim() : '',
+        phone: contactForm.querySelector('input[name="phone"]') ? contactForm.querySelector('input[name="phone"]').value.trim() : '',
+        email: contactForm.querySelector('input[name="email"]') ? contactForm.querySelector('input[name="email"]').value.trim() : '',
+        company: contactForm.querySelector('input[name="company"]') ? contactForm.querySelector('input[name="company"]').value.trim() : '',
+        message: contactForm.querySelector('textarea[name="message"]') ? contactForm.querySelector('textarea[name="message"]').value.trim() : ''
+      };
+
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params, EMAILJS_PUBLIC_KEY)
         .then(function() {
           btn.textContent      = 'SENT ✓';
           btn.style.background = '#4caf50';
